@@ -1,8 +1,9 @@
 # import from 3rd party module
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
+from .forms import QuestionModelForm, QuestionForm
 
 # import from local module
 from .models import Question, Choice
@@ -67,3 +68,18 @@ class IndexView(generic.ListView):
         """Return the last five published questions."""
         return Question.objects.order_by('-pub_date')[:5]
 
+# class QuestionCreate(generic.CreateView):
+#     model = Question
+#     fields = ['question_text']
+#     template_name = 'polls/question_form.html'
+#     success_url = reverse_lazy('polls:index')
+
+def buat_soal(request):
+    if request.method == 'POST':
+        form = QuestionModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('polls:index')
+    else:  # ini bagian GET
+        form = QuestionModelForm()
+    return render(request, 'polls/question_form.html', {'form': form})
